@@ -51,7 +51,7 @@ public:
     ** @Param pBuff: 包含文本的缓冲区
     ** @Param nBuffSize: 缓冲区大小
     */
-	void WriteLine(char * pBuff, size_t nBuffSize, INFO_TYPE emInfoType);
+	void WriteLine(char * pBuff, size_t nBuffSize, INFO_TYPE emInfoType = CDCLOG_INFO);
     /*
     ** 向控制台输出一行文本
     ** @Param pszMsg: 文本字符串

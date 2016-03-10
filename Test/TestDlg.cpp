@@ -94,7 +94,8 @@ HCURSOR CTestDlg::OnQueryDragIcon()
 void CTestDlg::OnBnClickedOk()
 {
 	CKDbgConsole::GetInstance().ShowConsole();
-	CKDbgConsole::GetInstance().WriteLine("www", CKDbgConsole::CDCLOG_ERROR);
+
+	CKDBGCONSOLE_INFO("www");
 
 	// TODO:  在此添加控件通知处理程序代码
 	//CDialogEx::OnOK();
