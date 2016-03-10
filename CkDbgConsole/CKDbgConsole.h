@@ -15,7 +15,7 @@
 
 #define CKDBGCONSOLE_INFO(szStr)  CKDbgConsole::GetInstance().WriteLine(szStr, CKDbgConsole::CDCLOG_INFO);
 #define CKDBGCONSOLE_WARN(szStr)  CKDbgConsole::GetInstance().WriteLine(szStr, CKDbgConsole::CDCLOG_WARNING);
-#define CKDBGCONSOLE_ERROR(szStr) CKDbgConsole::GetInstance().WriteLine(szStrm CKDbgConsole::CDCLOG_ERROR);
+#define CKDBGCONSOLE_ERROR(szStr) CKDbgConsole::GetInstance().WriteLine(szStrm, CKDbgConsole::CDCLOG_ERROR);
 
 class CK_API CKDbgConsole
 {
@@ -51,7 +51,7 @@ public:
     ** @Param pBuff: 包含文本的缓冲区
     ** @Param nBuffSize: 缓冲区大小
     */
-	void WriteLine(char * pBuff, size_t nBuffSize, INFO_TYPE emInfoType = CDCLOG_INFO);
+	void WriteLine(char * pBuff, size_t nBuffSize, INFO_TYPE emInfoType);
     /*
     ** 向控制台输出一行文本
     ** @Param pszMsg: 文本字符串
