@@ -54,12 +54,12 @@ CKDbgConsole & CKDbgConsole::GetInstance()
     return me;
 }
 
-void CKDbgConsole::WriteLine(const char * pszMsg)
+void CKDbgConsole::WriteLine(const char * pszMsg, INFO_TYPE emInfoType)
 {
-    WriteLine(const_cast<char*>(pszMsg), strlen(pszMsg)+1);
+	WriteLine(const_cast<char*>(pszMsg), strlen(pszMsg) + 1, emInfoType);
 }
 
-void CKDbgConsole::WriteLine(char * pBuff, size_t nBuffSize)
+void CKDbgConsole::WriteLine(char * pBuff, size_t nBuffSize, INFO_TYPE emInfoType)
 {
     if (!m_bInited || !pBuff || !nBuffSize)
         return;
@@ -72,6 +72,13 @@ void CKDbgConsole::WriteLine(char * pBuff, size_t nBuffSize)
 		::time(&lt);
 		::strftime(szBuf, 30, "[%Y/%m/%d %H:%M:%S]", ::localtime(&lt));
         ::WriteConsoleA(m_hConsoleHandle, szBuf, ::strlen(szBuf)+1, &nWriteNum, NULL);
+
+		if (CDCLOG_INFO == emInfoType)
+			::WriteConsoleA(m_hConsoleHandle, "<INFO> ", 8, &nWriteNum, NULL);
+		else if (CDCLOG_WARNING == emInfoType)
+			::WriteConsoleA(m_hConsoleHandle, "<WARN> ", 8, &nWriteNum, NULL);
+		else if (CDCLOG_ERROR == emInfoType)
+			::WriteConsoleA(m_hConsoleHandle, "<ERROR>", 8, &nWriteNum, NULL);
     }
     ::WriteConsoleA(m_hConsoleHandle, pBuff, nBuffSize, &nWriteNum, NULL);
     ::WriteConsoleA(m_hConsoleHandle, "\n", 1, &nWriteNum, NULL);
