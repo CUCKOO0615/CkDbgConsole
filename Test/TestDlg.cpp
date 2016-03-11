@@ -8,7 +8,13 @@
 #include "afxdialogex.h"
 #include "../CkDbgConsole/CKDbgConsole.h"
 
+#ifdef DEBUG
 #pragma comment(lib,"../Debug/CKDbgConsole.lib")
+#else
+#pragma comment(lib,"../Release/CKDbgConsole.lib")
+#endif // DEBUG
+
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
