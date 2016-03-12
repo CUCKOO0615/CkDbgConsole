@@ -5,71 +5,59 @@
 //************************************************
 #pragma once
 
-#ifdef EXPORT_CKDBGCONSOLE
-#define CK_API __declspec(dllexport)
-#else 
-#define CK_API __declspec(dllimport)
-#endif
-
-#include <windows.h>
-
 #if _MSC_VER<1600
-#define CKDBGCONSOLE_INFO(szStr)  CKDbgConsole::GetInstance().WriteLine(CKDbgConsole::CDCLOG_INFO, szStr);
-#define CKDBGCONSOLE_WARN(szStr)  CKDbgConsole::GetInstance().WriteLine(CKDbgConsole::CDCLOG_WARNING, szStr);
-#define CKDBGCONSOLE_ERROR(szStr) CKDbgConsole::GetInstance().WriteLine(CKDbgConsole::CDCLOG_ERROR, szStr);
+#define CKDBGCONSOLE_INFO(szStr)  CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_INFO, szStr);
+#define CKDBGCONSOLE_WARN(szStr)  CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_WARNING, szStr);
+#define CKDBGCONSOLE_ERROR(szStr) CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_ERROR, szStr);
 #else
-#define CKDBGCONSOLE_INFO(szStr,...)  CKDbgConsole::GetInstance().WriteLine(CKDbgConsole::CDCLOG_INFO, szStr, __VA_ARGS__);
-#define CKDBGCONSOLE_WARN(szStr,...)  CKDbgConsole::GetInstance().WriteLine(CKDbgConsole::CDCLOG_WARNING, szStr, __VA_ARGS__);
-#define CKDBGCONSOLE_ERROR(szStr,...) CKDbgConsole::GetInstance().WriteLine(CKDbgConsole::CDCLOG_ERROR, szStr, __VA_ARGS__);
+#define CKDBGCONSOLE_INFO(szStr,...)  CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_INFO, szStr, __VA_ARGS__);
+#define CKDBGCONSOLE_WARN(szStr,...)  CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_WARNING, szStr, __VA_ARGS__);
+#define CKDBGCONSOLE_ERROR(szStr,...) CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_ERROR, szStr, __VA_ARGS__);
 #endif
 
-class CK_API CKDbgConsole
+#ifdef EXPORT_CKDBGCONSOLE
+#define CK_API extern "C" __declspec(dllexport)
+#else 
+#define CK_API extern "C" __declspec(dllimport)
+#endif
+
+namespace CKDbgConsole
 {
-public:
-	typedef enum emCKDbgConsoleInfoType
+	enum INFO_TYPE
 	{
-		CDCLOG_INFO, CDCLOG_WARNING, CDCLOG_ERROR
-	}INFO_TYPE;
+		CDCLOG_INFO,
+		CDCLOG_WARNING,
+		CDCLOG_ERROR
+	};
 
-	//获取单例
-    static CKDbgConsole & GetInstance();
+	// 打开控制台窗体
+	CK_API bool ShowConsole();
 
-	/*
-	** 打开控制台窗体
-	*/
-	bool ShowConsole();
+	// 关闭控制台窗体
+	CK_API void ExitConsole();
+
 	/*
 	** 向控制台输出一行文本
-	** @Param pszMsg: 文本字符串,支持变参格式化
+	** @Param emInfoType: 日志类型,详见 INFO_TYPE
+	** @Param pszMsg: 文本字符串,支持变参格式化, 每次最多输出512个字符
 	*/
-	void WriteLine(INFO_TYPE emInfoType, const char * pszMsg, ...);
+	CK_API void WriteLine(INFO_TYPE emInfoType, const char * pszMsg, ...);
 	/*
 	** 向控制台输出文本
-	** @Param pszMsg: 文本字符串, 支持变参格式化
+	** @Param pszMsg: 文本字符串, 支持变参格式化, 每次最多输出512个字符
 	*/
-	void Write(const char * pszMsg, ...);
-	/*
-	** 关闭控制台窗体
-	*/
-	void ExitConsole();
+	CK_API void Write(const char * pszMsg, ...);
+
 	/*
 	** 日志时间显示/隐藏
 	** @Param bShow: true显示,false隐藏
 	*/
-	void ShowLogTime(bool bShow = true);
-    /*
-    ** 设置命令行窗体标题
-    ** @Param szTitle: 命令行窗体标题
-    */
-	void SetTitle(const char* szTitle);
+	CK_API void ShowLogTime(bool bShow = true);
+	/*
+	** 设置命令行窗体标题
+	** @Param szTitle: 命令行窗体标题
+	*/
+	CK_API void SetTitle(const char* szTitle);
 
-private:
-    CKDbgConsole();
-    bool m_bInited;
-    bool m_bShowLogTime;
-    HANDLE m_hConsoleHandle;
-	CRITICAL_SECTION m_csWriteLock;
-public:
-    ~CKDbgConsole();
 };
 

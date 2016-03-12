@@ -14,16 +14,11 @@
 #pragma comment(lib,"../Release/CKDbgConsole.lib")
 #endif // DEBUG
 
-
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-
 // CTestDlg 对话框
-
-
 
 CTestDlg::CTestDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CTestDlg::IDD, pParent)
@@ -95,12 +90,12 @@ HCURSOR CTestDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-
+//////////////////////////////////////////////////////////////////////////
 
 void CTestDlg::OnBnClickedOk()
 {
-	CKDbgConsole::GetInstance().ShowConsole();
-	CKDbgConsole::GetInstance().WriteLine(CKDbgConsole::CDCLOG_INFO, "%s|%d", "1112", 10);
+	CKDbgConsole::ShowConsole();
+	CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_INFO, "%s|%d", "1112", 10);
 	//CKDBGCONSOLE_INFO("%s|%s|%d", "111","222",10);
 
 	// TODO:  在此添加控件通知处理程序代码

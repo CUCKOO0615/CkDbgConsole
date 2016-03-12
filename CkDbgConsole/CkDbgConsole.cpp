@@ -6,121 +6,126 @@
 
 #define EXPORT_CKDBGCONSOLE
 
+#define BUFFSIZE_512 512
+
 #include "CKDbgConsole.h"
+#include <windows.h>
 #include <time.h>
 #include <stdarg.h>
 #include <stdio.h>
 
-#define BUFFSIZE_512 512
+bool g_bInited = false;
+bool g_bShowLogTime = true;
+HANDLE g_hConsoleHandle = NULL;
+CRITICAL_SECTION g_csWriteLock;
 
-CKDbgConsole::CKDbgConsole():m_bInited(false),m_bShowLogTime(true),m_hConsoleHandle(NULL)
+namespace CKDbgConsole
 {
-	::InitializeCriticalSectionAndSpinCount(&m_csWriteLock, 8000);
-}
-
-CKDbgConsole::~CKDbgConsole()
-{
-	::DeleteCriticalSection(&m_csWriteLock);
-	ExitConsole();
-}
-
-bool CKDbgConsole::ShowConsole()
-{
-	if(m_bInited)		        return true;
-	if(0 ==  ::AllocConsole())	return false;
-
-	HWND hHwnd = ::GetConsoleWindow();
-	if(hHwnd)
+	//////////////////////////////////////////////////////////////////////////
+	//AutoUtil Class
+	class AutoMgr
 	{
-		HMENU hMenu = ::GetSystemMenu( hHwnd, FALSE);
-		if(hMenu) ::RemoveMenu( hMenu, 0xF060, 0);
-		m_hConsoleHandle = ::GetStdHandle(STD_OUTPUT_HANDLE);
+	public:
+		AutoMgr()
+		{
+			::InitializeCriticalSectionAndSpinCount(&g_csWriteLock, 8000);
+		}
+		~AutoMgr()
+		{
+			::DeleteCriticalSection(&g_csWriteLock);
+			ExitConsole();
+		}
+	};
+	static AutoMgr am;
+
+	//////////////////////////////////////////////////////////////////////////
+	// Implements
+
+	bool ShowConsole()
+	{
+		if (g_bInited)		        return true;
+		if (0 == ::AllocConsole())	return false;
+
+		HWND hHwnd = ::GetConsoleWindow();
+		if (hHwnd)
+		{
+			HMENU hMenu = ::GetSystemMenu(hHwnd, FALSE);
+			if (hMenu) ::RemoveMenu(hMenu, 0xF060, 0);
+			g_hConsoleHandle = ::GetStdHandle(STD_OUTPUT_HANDLE);
+		}
+
+		g_bInited = (hHwnd && g_hConsoleHandle);
+		if (!g_bInited) ::FreeConsole();
+		return g_bInited;
 	}
 
-	m_bInited = (hHwnd && m_hConsoleHandle);
-	if(!m_bInited) ::FreeConsole();
-	return m_bInited;
-}
-
-void CKDbgConsole::ExitConsole()
-{
-	if(!m_bInited)
-		return;
-	::FreeConsole();
-	::CloseHandle(m_hConsoleHandle);
-	m_hConsoleHandle = NULL;
-	m_bInited = false;
-}
-
-CKDbgConsole & CKDbgConsole::GetInstance()
-{
-    static CKDbgConsole me;
-    return me;
-}
-
-void CKDbgConsole::WriteLine(INFO_TYPE emInfoType,const char * pszMsg,  ...)
-{
-	if (!m_bInited || !pszMsg)
-		return;
-	::EnterCriticalSection(&m_csWriteLock);
-
-	DWORD nWriteNum = 0;
-	if (m_bShowLogTime)
+	void ExitConsole()
 	{
-		char szBuf[30] = { 0 };
-		time_t lt;
-		::time(&lt);
-		::strftime(szBuf, 30, "[%Y/%m/%d %H:%M:%S]", ::localtime(&lt));
-		::WriteConsoleA(m_hConsoleHandle, szBuf, ::strlen(szBuf) + 1, &nWriteNum, NULL);
+		if (!g_bInited)	return;
+		::FreeConsole();
+		::CloseHandle(g_hConsoleHandle);
+		g_hConsoleHandle = NULL;
+		g_bInited = false;
 	}
 
-	const char* szLogType = NULL;
-	if (CDCLOG_INFO == emInfoType)
-		szLogType = "<INFO> ";
-	else if (CDCLOG_WARNING == emInfoType)
-		szLogType = "<WARN> ";
-	else if (CDCLOG_ERROR == emInfoType)
-		szLogType = "<ERROR>";
-	::WriteConsoleA(m_hConsoleHandle, szLogType, 8, &nWriteNum, NULL);
+	void WriteLine(INFO_TYPE emInfoType, const char * pszMsg, ...)
+	{
+		if (!g_bInited || !pszMsg) return;
+		::EnterCriticalSection(&g_csWriteLock);
 
-	char buff[BUFFSIZE_512] = { 0 };
-	va_list argList;
-	va_start(argList, pszMsg);
-	::_vsnprintf(buff, BUFFSIZE_512, pszMsg, argList);
-	va_end(argList);
-	size_t nLen = ::strlen(buff);
-	::WriteConsoleA(m_hConsoleHandle, buff, min(nLen, BUFFSIZE_512), &nWriteNum, NULL);
-	::WriteConsoleA(m_hConsoleHandle, "\n", 1, &nWriteNum, NULL);
+		DWORD nWriteNum = 0;
+		if (g_bShowLogTime)
+		{
+			char szBuf[30] = { 0 };
+			time_t lt;
+			::time(&lt);
+			::strftime(szBuf, 30, "[%Y/%m/%d %H:%M:%S]", ::localtime(&lt));
+			::WriteConsoleA(g_hConsoleHandle, szBuf, ::strlen(szBuf) + 1, &nWriteNum, NULL);
+		}
 
-	::LeaveCriticalSection(&m_csWriteLock);
-	return;
-}
+		const char* arrLogTypes[] = { "<INFO> ", "<WARN> ", "<ERROR>" };
+		::WriteConsoleA(g_hConsoleHandle, arrLogTypes[emInfoType], 8, &nWriteNum, NULL);
 
-void CKDbgConsole::Write(const char * pszMsg, ...)
-{
-	if (!m_bInited || !pszMsg)
+		char buff[BUFFSIZE_512] = { 0 };
+		va_list argList;
+		va_start(argList, pszMsg);
+		::_vsnprintf(buff, BUFFSIZE_512, pszMsg, argList);
+		va_end(argList);
+
+		size_t nLen = ::strlen(buff);
+		::WriteConsoleA(g_hConsoleHandle, buff, min(nLen, BUFFSIZE_512), &nWriteNum, NULL);
+		::WriteConsoleA(g_hConsoleHandle, "\n", 1, &nWriteNum, NULL);
+
+		::LeaveCriticalSection(&g_csWriteLock);
 		return;
-	::EnterCriticalSection(&m_csWriteLock);
+	}
 
-	char buff[BUFFSIZE_512] = { 0 };
-	va_list argList;
-	va_start(argList, pszMsg);
-	::_vsnprintf(buff, BUFFSIZE_512, pszMsg, argList);
-	va_end(argList);
-	size_t nLen = ::strlen(buff);
-	DWORD nWriteNum = 0;
-	::WriteConsoleA(m_hConsoleHandle, buff, min(nLen, BUFFSIZE_512), &nWriteNum, NULL);
+	void Write(const char * pszMsg, ...)
+	{
+		if (!g_bInited || !pszMsg) return;
+		::EnterCriticalSection(&g_csWriteLock);
 
-	::LeaveCriticalSection(&m_csWriteLock);
-	return;
-}
+		char buff[BUFFSIZE_512] = { 0 };
+		va_list argList;
+		va_start(argList, pszMsg);
+		::_vsnprintf(buff, BUFFSIZE_512, pszMsg, argList);
+		va_end(argList);
 
-void CKDbgConsole::ShowLogTime(bool bShow)   
-{ 
-	m_bShowLogTime = bShow; 
-}
+		size_t nLen = ::strlen(buff);
+		DWORD nWriteNum = 0;
+		::WriteConsoleA(g_hConsoleHandle, buff, min(nLen, BUFFSIZE_512), &nWriteNum, NULL);
 
-void CKDbgConsole::SetTitle(const char* szTitle)    
-{ 
-	::SetConsoleTitleA(szTitle); 
+		::LeaveCriticalSection(&g_csWriteLock);
+		return;
+	}
+
+	void ShowLogTime(bool bShow)
+	{
+		g_bShowLogTime = bShow;
+	}
+
+	void SetTitle(const char* szTitle)
+	{
+		if (g_bInited && szTitle) ::SetConsoleTitleA(szTitle);
+	}
 }
