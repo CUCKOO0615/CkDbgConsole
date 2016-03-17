@@ -15,11 +15,16 @@
 #define CKDBGCONSOLE_ERROR(szStr,...) CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_ERROR, szStr, __VA_ARGS__);
 #endif
 
+//#define CKDBGCONSOLE_STATICLIB
+#ifdef CKDBGCONSOLE_STATICLIB
+#define CK_API 
+#else
 #ifdef EXPORT_CKDBGCONSOLE
 #define CK_API extern "C" __declspec(dllexport)
 #else 
 #define CK_API extern "C" __declspec(dllimport)
 #endif
+#endif // CKDBGCONSOLE_STATICLIB
 
 namespace CKDbgConsole
 {
