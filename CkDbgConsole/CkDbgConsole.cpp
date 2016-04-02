@@ -4,6 +4,8 @@
 //◇说明：MFC命令行调试工具 实现
 //*************************************************
 
+#pragma warning(disable:4996)
+
 #define EXPORT_CKDBGCONSOLE
 
 #define BUFFSIZE_512 512
@@ -21,24 +23,7 @@ CRITICAL_SECTION g_csWriteLock;
 
 namespace CKDbgConsole
 {
-	//////////////////////////////////////////////////////////////////////////
-	//AutoUtil Class
-	class AutoMgr
-	{
-	public:
-		AutoMgr()
-		{
-			::InitializeCriticalSectionAndSpinCount(&g_csWriteLock, 8000);
-		}
-		~AutoMgr()
-		{
-			::DeleteCriticalSection(&g_csWriteLock);
-			ExitConsole();
-		}
-	};
-	static AutoMgr am;
-
-	//////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////
 	// Implements
 
 	bool ShowConsole()
@@ -128,4 +113,22 @@ namespace CKDbgConsole
 	{
 		if (g_bInited && szTitle) ::SetConsoleTitleA(szTitle);
 	}
-}
+};
+
+//////////////////////////////////////////////////////////////////////////
+//AutoUtil Class
+class AutoMgr
+{
+public:
+	AutoMgr()
+	{
+		::InitializeCriticalSectionAndSpinCount(&g_csWriteLock, 8000);
+	}
+	~AutoMgr()
+	{
+		::DeleteCriticalSection(&g_csWriteLock);
+		CKDbgConsole::ExitConsole();
+	}
+
+};
+static AutoMgr am;
