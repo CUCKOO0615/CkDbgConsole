@@ -78,8 +78,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\Debug\CkDbgConsole.dll  ..\Bin\CkDbgConsole.dll
-copy ..\Debug\CkDbgConsole.lib  ..\Bin\CkDbgConsole.lib
+      <Command>copy ..\Debug\CkDbgConsole.dll  ..\Bin\CkDbgConsole_D.dll
+copy ..\Debug\CkDbgConsole.lib  ..\Bin\CkDbgConsole_D.lib
 copy CKDbgConsole.h ..\Bin\CKDbgConsole.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
