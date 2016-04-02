@@ -79,7 +79,8 @@
     </Link>
     <PostBuildEvent>
       <Command>copy ..\Debug\CkDbgConsole.dll  ..\Bin\CkDbgConsole.dll
-copy ..\Debug\CkDbgConsole.lib  ..\Bin\CkDbgConsole.lib</Command>
+copy ..\Debug\CkDbgConsole.lib  ..\Bin\CkDbgConsole.lib
+copy CKDbgConsole.h ..\Bin\CKDbgConsole.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -100,7 +101,8 @@ copy ..\Debug\CkDbgConsole.lib  ..\Bin\CkDbgConsole.lib</Command>
     </Link>
     <PostBuildEvent>
       <Command>copy ..\Release\CkDbgConsole.dll  ..\Bin\CkDbgConsole.dll
-copy ..\Release\CkDbgConsole.lib  ..\Bin\CkDbgConsole.lib</Command>
+copy ..\Release\CkDbgConsole.lib  ..\Bin\CkDbgConsole.lib
+copy CKDbgConsole.h ..\Bin\CKDbgConsole.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='StaticLib|Win32'">
@@ -120,7 +122,8 @@ copy ..\Release\CkDbgConsole.lib  ..\Bin\CkDbgConsole.lib</Command>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\StaticLib\CkDbgConsole_Static.lib  ..\Bin\CkDbgConsole_Static.lib</Command>
+      <Command>copy ..\StaticLib\CkDbgConsole_Static.lib  ..\Bin\CkDbgConsole_Static.lib
+copy CKDbgConsole.h ..\Bin\CKDbgConsole.h</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
