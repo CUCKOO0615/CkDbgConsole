@@ -6,7 +6,7 @@
 #include "Test.h"
 #include "TestDlg.h"
 #include "afxdialogex.h"
-#include "../CkDbgConsole/CKDbgConsole.h"
+#include "..\CkDbgConsole\CKDbgConsole.h"
 
 #ifdef DEBUG
 #pragma comment(lib,"../Debug/CKDbgConsole.lib")
@@ -95,7 +95,7 @@ HCURSOR CTestDlg::OnQueryDragIcon()
 void CTestDlg::OnBnClickedOk()
 {
 	CKDbgConsole::ShowConsole();
-	CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_INFO, "%s|%d", "1112", 10);
+	CKDBGCONSOLE_INFO("%s|%d", "1112", 10);
 	//CKDBGCONSOLE_INFO("%s|%s|%d", "111","222",10);
 
 	// TODO:  在此添加控件通知处理程序代码

@@ -1,19 +1,9 @@
 //************************************************
 //◇作者：CUCKOO0615
 //◇日期：2015/01/26 16:37:16
-//◇说明：MFC命令行调试工具, 仅限在基于MFC的程序中使用
+//◇说明：MFC命令行调试工具, 仅限在基于MFC的程序中使用 (静态链接)
 //************************************************
 #pragma once
-
-#if _MSC_VER<1600
-#define CKDBGCONSOLE_INFO(szStr)  CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_INFO, szStr);
-#define CKDBGCONSOLE_WARN(szStr)  CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_WARNING, szStr);
-#define CKDBGCONSOLE_ERROR(szStr) CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_ERROR, szStr);
-#else
-#define CKDBGCONSOLE_INFO(szStr,...)  CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_INFO, szStr, __VA_ARGS__);
-#define CKDBGCONSOLE_WARN(szStr,...)  CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_WARNING, szStr, __VA_ARGS__);
-#define CKDBGCONSOLE_ERROR(szStr,...) CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_ERROR, szStr, __VA_ARGS__);
-#endif
 
 //#define CKDBGCONSOLE_STATICLIB
 #ifdef CKDBGCONSOLE_STATICLIB
@@ -25,6 +15,20 @@
 #define CK_API extern "C" __declspec(dllimport)
 #endif
 #endif // CKDBGCONSOLE_STATICLIB
+
+
+#if _MSC_VER<1600
+CK_API void CKDBGCONSOLE_INFO(const char* szStr, ...);
+CK_API void CKDBGCONSOLE_WARN(const char* szStr, ...);
+CK_API void CKDBGCONSOLE_ERROR(const char* szStr, ...);
+#else
+#define CKDBGCONSOLE_INFO(szStr,...)  \
+	CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_INFO, szStr, __VA_ARGS__);
+#define CKDBGCONSOLE_WARN(szStr,...)  \
+	CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_WARNING, szStr, __VA_ARGS__);
+#define CKDBGCONSOLE_ERROR(szStr,...) \
+	CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_ERROR, szStr, __VA_ARGS__);
+#endif
 
 namespace CKDbgConsole
 {

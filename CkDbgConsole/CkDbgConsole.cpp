@@ -114,7 +114,36 @@ namespace CKDbgConsole
 		if (g_bInited && szTitle) ::SetConsoleTitleA(szTitle);
 	}
 };
-
+//////////////////////////////////////////////////////////////////////////
+#if _MSC_VER<1600
+CK_API void CKDBGCONSOLE_INFO(const char* szStr, ...)
+{
+	va_list argList;
+	va_start(argList, szStr);
+	char buff[512] = { 0 };
+	::vsprintf(buff, szStr, argList);
+	CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_INFO, buff);
+	va_end(argList);
+}
+CK_API void CKDBGCONSOLE_WARN(const char* szStr, ...)
+{
+	va_list argList;
+	va_start(argList, szStr);
+	char buff[512] = { 0 };
+	::vsprintf(buff, szStr, argList);
+	CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_WARNING, buff);
+	va_end(argList);
+}
+CK_API void CKDBGCONSOLE_ERROR(const char* szStr, ...)
+{
+	va_list argList;
+	va_start(argList, szStr);
+	char buff[512] = { 0 };
+	::vsprintf(buff, szStr, argList);
+	CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_ERROR, buff);
+	va_end(argList);
+}
+#endif
 //////////////////////////////////////////////////////////////////////////
 //AutoUtil Class
 class AutoMgr
