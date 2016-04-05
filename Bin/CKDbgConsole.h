@@ -18,9 +18,9 @@
 
 
 #if _MSC_VER<1600
-void CKDBGCONSOLE_INFO(const char* szStr, ...);
-void CKDBGCONSOLE_WARN(const char* szStr, ...);
-void CKDBGCONSOLE_ERROR(const char* szStr, ...);
+static void CKDBGCONSOLE_INFO(const char* szStr, ...);
+static void CKDBGCONSOLE_WARN(const char* szStr, ...);
+static void CKDBGCONSOLE_ERROR(const char* szStr, ...);
 #else
 #define CKDBGCONSOLE_INFO(szStr,...)  \
 	CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_INFO, szStr, __VA_ARGS__);
@@ -74,7 +74,7 @@ namespace CKDbgConsole
 #if _MSC_VER<1600
 #include <stdarg.h>
 
-void CKDBGCONSOLE_INFO(const char* szStr, ...)
+static void CKDBGCONSOLE_INFO(const char* szStr, ...)
 {
     va_list argList;
     va_start(argList, szStr);
@@ -83,7 +83,7 @@ void CKDBGCONSOLE_INFO(const char* szStr, ...)
     CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_INFO, buff);
     va_end(argList);
 }
-void CKDBGCONSOLE_WARN(const char* szStr, ...)
+static void CKDBGCONSOLE_WARN(const char* szStr, ...)
 {
     va_list argList;
     va_start(argList, szStr);
@@ -92,7 +92,7 @@ void CKDBGCONSOLE_WARN(const char* szStr, ...)
     CKDbgConsole::WriteLine(CKDbgConsole::CDCLOG_WARNING, buff);
     va_end(argList);
 }
-void CKDBGCONSOLE_ERROR(const char* szStr, ...)
+static void CKDBGCONSOLE_ERROR(const char* szStr, ...)
 {
     va_list argList;
     va_start(argList, szStr);
